@@ -10,19 +10,26 @@ use syn::{
     Type, TypePath,
 };
 
+mod expand;
+
 #[proc_macro_derive(Builder, attributes(builder))]
 pub fn derive(input: TokenStream) -> TokenStream {
+    // let input = parse_macro_input!(input as DeriveInput);
+    // let name = input.ident;
+
+    // let builder_name = generate_builder_name(&name);
+    // let builder = generate_builder_struct(&name, &builder_name, &input.data);
+
+    // let expanded = quote! {
+    //     #builder
+    // };
+
+    // TokenStream::from(expanded)
+
     let input = parse_macro_input!(input as DeriveInput);
-    let name = input.ident;
-
-    let builder_name = generate_builder_name(&name);
-    let builder = generate_builder_struct(&name, &builder_name, &input.data);
-
-    let expanded = quote! {
-        #builder
-    };
-
-    TokenStream::from(expanded)
+    expand::derive(&input)
+        .unwrap_or_else(|err| err.to_compile_error())
+        .into()
 }
 
 fn generate_builder_name(name: &Ident) -> Ident {
